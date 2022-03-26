@@ -23,8 +23,8 @@ public class ProductService {
     }
 
     public Product read(long id) {
-        Optional<Product> product = productRepository.findById(id);
-        return product.get();
+        Product product = productRepository.findById(id).get();
+        return product;
     }
 
     public void create(Product product) {

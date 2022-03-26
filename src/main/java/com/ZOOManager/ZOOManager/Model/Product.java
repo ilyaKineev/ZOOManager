@@ -67,12 +67,9 @@ public class Product {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", quantity=" + quantity +
+                ", measure='" + measure + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }
 
-//INSERT INTO PRODUCT  VALUES(1, 'VEGETABLE', 'pcs', 'Carrot',100);
-//INSERT INTO PRODUCT  VALUES(1, 'VEGETABLE', 'pcs', 'Carrot',100);
-//INSERT INTO PRODUCT  VALUES(1, 'VEGETABLE', 'pcs', 'Carrot',100);
-//INSERT INTO PRODUCT  VALUES(1, 'VEGETABLE', 'pcs', 'Carrot',100);
-//INSERT INTO PRODUCT  VALUES(1, 'VEGETABLE', 'pcs', 'Carrot',100);
