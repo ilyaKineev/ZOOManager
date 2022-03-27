@@ -3,6 +3,7 @@ package com.ZOOManager.ZOOManager.Model;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 
 @Entity
@@ -46,6 +47,19 @@ public class Animal {
 
     public void setPredator(boolean predator) {
         isPredator = predator;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Animal animal = (Animal) o;
+        return id == animal.id && isPredator == animal.isPredator && Objects.equals(name, animal.name) && Objects.equals(kindOfAnimal, animal.kindOfAnimal);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, kindOfAnimal, isPredator);
     }
 
     @Override

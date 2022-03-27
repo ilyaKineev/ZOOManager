@@ -18,22 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class ZooService {
-    ProductRepository productRepository;
-    DietRepository dietRepository;
-    AnimalRepository animalRepository;
+public class ZooService extends AbstractService {
 
     public ZooService(ProductRepository productRepository, DietRepository dietRepository, AnimalRepository animalRepository) {
-        this.productRepository = productRepository;
-        this.dietRepository = dietRepository;
-        this.animalRepository = animalRepository;
+        super(productRepository, dietRepository, animalRepository);
     }
 
-    public List<ProductInformation> get() {
-        List<Diet> dietList = (List<Diet>) dietRepository.findAll();
+    public List<ProductInformation> readProductInformationByWeek() {
         Map<Product, Integer> map = new HashMap<>();
-
-        for (Diet diet : dietList) {
+        for (Diet diet : dietRepository.findAll()) {
             if (map.containsKey(diet.getProduct())) {
                 Integer norm = map.get(diet.getProduct());
                 norm = norm + diet.getNorm();
@@ -42,7 +35,6 @@ public class ZooService {
                 map.put(diet.getProduct(), diet.getNorm());
             }
         }
-
         List<ProductInformation> list = new ArrayList<>();
         for (Map.Entry<Product, Integer> m : map.entrySet()) {
             String name = m.getKey().getName();
@@ -59,21 +51,15 @@ public class ZooService {
 
         return list;
     }
-//      1. Название животного, вид, список продуктов (название, тип, потребление, единица измерения).
-//      2. Необязательные параметры запроса: вид животного, тип продукта, хищник или нет и произвольная строка с названием животного (строка может не содержать полное название животного).
 
-    public List<AnimalInformation> getAnimal() {
+    public List<AnimalInformation> readAnimalInformation() {
         List<AnimalInformation> list = new ArrayList<>();
         List<Diet> dietList = (List<Diet>) dietRepository.findAll();
-
         for (Diet diet : dietList) {
             Product product = diet.getProduct();
             Animal animal = diet.getAnimal();
-
             AnimalInformation animalInformation = new AnimalInformation(animal.getName(), animal.getKindOfAnimal());
             ProductForAnimal productForAnimal = new ProductForAnimal(product.getName(), product.getType(), diet.getNorm(), product.getMeasure());
-
-
             if (list.contains(animalInformation)) {
                 AnimalInformation animalInformationNew = list.get(list.indexOf(animalInformation));
                 animalInformationNew.addProductForAnimals(productForAnimal);
@@ -85,38 +71,38 @@ public class ZooService {
         return list;
     }
 
-    public void update(long id, int quantity) {
+    public boolean updateQuantityProductByID(long id, int quantity) {
         Product product = productRepository.findById(id).get();
         product.setQuantity(quantity);
         productRepository.save(product);
+        return product.getQuantity() == productRepository.findById(id).get().getQuantity();
     }
 
-    //    5. Назначение продукта животному.
-
-    public boolean addProduct(long id, long products_id) {
-        Animal animal = animalRepository.findById(id).get();
-        Product product = productRepository.findById(products_id).get();
+    public boolean createProductToAnimal(long id, long products_id) {
         Diet diet = new Diet();
-        diet.setAnimal(animal);
-        diet.setProduct(product);
+        diet.setAnimal(animalRepository.findById(id).get());
+        diet.setProduct(productRepository.findById(products_id).get());
         dietRepository.save(diet);
-        return true;
+        return dietRepository.existsById(diet.getId());
     }
-    public boolean addProduct(long id, long[] products_id) {
+
+    public boolean createProductToAnimal(long id, long[] products_id) {
+        long statistic = dietRepository.count();
         Animal animal = animalRepository.findById(id).get();
-        for (long i: products_id) {
+        for (long i : products_id) {
             Product product = productRepository.findById(Long.valueOf(i)).get();
             Diet diet = new Diet();
             diet.setAnimal(animal);
             diet.setProduct(product);
             dietRepository.save(diet);
         }
-        return true;
+        return (statistic + products_id.length) == dietRepository.count();
     }
 
-    public void updateNorm(long id, int norm) {
+    public boolean updateNorm(long id, int norm) {
         Diet diet = dietRepository.findById(id).get();
         diet.setNorm(norm);
         dietRepository.save(diet);
+        return dietRepository.findById(id).get().getNorm() == norm;
     }
 }

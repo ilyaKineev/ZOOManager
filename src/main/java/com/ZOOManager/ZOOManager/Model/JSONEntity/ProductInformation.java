@@ -2,8 +2,9 @@ package com.ZOOManager.ZOOManager.Model.JSONEntity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class ProductInformation {
-    //    5. Получить информацию о питании животных на 7 дней от заданной даты. Название продукта, сколько продукта надо на 7 дней, сколько продукта всего есть, сколько его не хватает (если продукта достаточно, то вернуть null), единица измерения.
     @JsonProperty(value = "name")
     private String name;
     @JsonProperty(value = "number")
@@ -23,5 +24,27 @@ public class ProductInformation {
         this.measure = measure;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductInformation that = (ProductInformation) o;
+        return number == that.number && quantity == that.quantity && Objects.equals(name, that.name) && Objects.equals(deficit, that.deficit) && Objects.equals(measure, that.measure);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, number, quantity, deficit, measure);
+    }
+
+    @Override
+    public String toString() {
+        return "ProductInformation{" +
+                "name='" + name + '\'' +
+                ", number=" + number +
+                ", quantity=" + quantity +
+                ", deficit=" + deficit +
+                ", measure='" + measure + '\'' +
+                '}';
+    }
 }

@@ -2,18 +2,22 @@ package com.ZOOManager.ZOOManager.Controllers;
 
 import com.ZOOManager.ZOOManager.Model.JSONEntity.AnimalInformation;
 import com.ZOOManager.ZOOManager.Model.JSONEntity.ProductInformation;
-import com.ZOOManager.ZOOManager.Model.Product;
 import com.ZOOManager.ZOOManager.Service.ZooService;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 public class ZooControllers {
 
+    Logger logger = org.slf4j.LoggerFactory.getLogger(AnimalControllers.class);
     ZooService zooService;
 
     @Autowired
@@ -21,48 +25,56 @@ public class ZooControllers {
         this.zooService = zooService;
     }
 
-    @GetMapping(value = "/zoo")
-    public ResponseEntity<List<ProductInformation>> read() {
-        List<ProductInformation> list = zooService.get();
+    @GetMapping(value = "/zoo/week")
+    public ResponseEntity<List<ProductInformation>> readProduct() {
+        logger.info("Get_Products_By_One_Week");
+        List<ProductInformation> list = zooService.readProductInformationByWeek();
         return list != null && !list.isEmpty()
                 ? new ResponseEntity<>(list, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(value = "/zooinfo")
+    @GetMapping(value = "/zoo/info")
     public ResponseEntity<List<AnimalInformation>> readAnimal() {
-        List<AnimalInformation> list = zooService.getAnimal();
+        logger.info("Get_All_Info_by_ZOO");
+        List<AnimalInformation> list = zooService.readAnimalInformation();
         return list != null && !list.isEmpty()
                 ? new ResponseEntity<>(list, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(value = "zoo/quantity")
-    public ResponseEntity<?> update(@RequestParam(name = "id") long id, @RequestParam(name = "quantity") int quantity) {
-        zooService.update(id,quantity);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-
-    @PutMapping(value = "zoo/add")
-    public ResponseEntity<?> addProduct(@RequestParam(name = "id") long id, @RequestParam(name = "product") long product) {
-        final boolean updated = zooService.addProduct(id, product);
-        return updated
+    @PutMapping(value = "zoo/quantity")
+    public ResponseEntity<?> updateQuantityProductByID(@RequestParam(name = "id") long id, @RequestParam(name = "quantity") int quantity) {
+        logger.info("Update_Quantity_By_id");
+        final boolean update = zooService.updateQuantityProductByID(id, quantity);
+        return update
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    @PutMapping(value = "zoo/adds")
-    public ResponseEntity<?> addProducts(@RequestParam(name = "id") long id, @RequestParam(name = "product") long[] product) {
-        final boolean updated = zooService.addProduct(id, product);
-        return updated
+    @PutMapping(value = "zoo/product")
+    public ResponseEntity<?> createProductToAnimal(@RequestParam(name = "id") long id, @RequestParam(name = "product") long product) {
+        logger.info("Set_Product_For_An_Animal");
+        final boolean create = zooService.createProductToAnimal(id, product);
+        return create
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    @GetMapping(value = "zoo/norm")
+    @PutMapping(value = "zoo/products")
+    public ResponseEntity<?> createProductToAnimal(@RequestParam(name = "id") long id, @RequestParam(name = "product") long[] product) {
+        logger.info("Set_Group_Product_For_An_Animal");
+        final boolean answer = zooService.createProductToAnimal(id, product);
+        return answer
+                ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+    }
+
+    @PutMapping(value = "zoo/norm")
     public ResponseEntity<?> updateNorm(@RequestParam(name = "id") long id, @RequestParam(name = "norm") int norm) {
-        zooService.updateNorm(id,norm);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        final boolean update = zooService.updateNorm(id, norm);
+        return update
+                ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 }

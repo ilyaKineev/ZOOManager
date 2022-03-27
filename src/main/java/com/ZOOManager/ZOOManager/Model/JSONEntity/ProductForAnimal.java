@@ -2,6 +2,8 @@ package com.ZOOManager.ZOOManager.Model.JSONEntity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class ProductForAnimal {
     @JsonProperty(value = "name")
     private String name;
@@ -17,6 +19,19 @@ public class ProductForAnimal {
         this.type = type;
         this.norm = norm;
         this.measure = measure;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductForAnimal that = (ProductForAnimal) o;
+        return norm == that.norm && Objects.equals(name, that.name) && Objects.equals(type, that.type) && Objects.equals(measure, that.measure);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, norm, measure);
     }
 
     @Override

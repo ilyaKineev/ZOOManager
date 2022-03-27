@@ -2,60 +2,61 @@ package com.ZOOManager.ZOOManager.Service;
 
 
 import com.ZOOManager.ZOOManager.Model.Product;
+import com.ZOOManager.ZOOManager.Repository.AnimalRepository;
+import com.ZOOManager.ZOOManager.Repository.DietRepository;
 import com.ZOOManager.ZOOManager.Repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductService {
-    ProductRepository productRepository;
+public class ProductService extends AbstractService {
 
-    @Autowired
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+
+    public ProductService(ProductRepository productRepository, DietRepository dietRepository, AnimalRepository animalRepository) {
+        super(productRepository, dietRepository, animalRepository);
     }
 
     public List<Product> readAll() {
         return (List<Product>) productRepository.findAll();
     }
 
-    public Product read(long id) {
-        Product product = productRepository.findById(id).get();
-        return product;
+    public Product readProduct(long id) {
+        Optional<Product> product = (productRepository.findById(id));
+        return product.orElseGet(Product::new);
     }
 
-    public void create(Product product) {
+    public boolean create(Product product) {
         productRepository.save(product);
+        return productRepository.existsById(product.getId());
     }
 
     public boolean update(Product product, long id) {
-        Optional<Product> productOptional = productRepository.findById(id);
-        Product oldProduct = productOptional.get();
+        Product oldProduct = readProduct(id);
         oldProduct.setName(product.getName());
         oldProduct.setQuantity(product.getQuantity());
         oldProduct.setMeasure(product.getMeasure());
         oldProduct.setType(product.getType());
         productRepository.save(oldProduct);
-        return true;
+        return !oldProduct.equals(productRepository.existsById(id));
     }
 
-    public boolean delete(long id) {
+    public boolean deleteProduct(long id) {
         productRepository.deleteById(id);
-        return true;
+        return !productRepository.existsById(id);
     }
 
     public boolean delete(List<Product> products) {
+        boolean isExists = false;
         for (Product product : products) {
-            productRepository.deleteById(product.getId());
+            isExists = deleteProduct(product.getId());
         }
-        return true;
+        return isExists;
     }
 
     public boolean delete() {
         productRepository.deleteAll();
-        return true;
+        return productRepository.count() <= 0;
     }
 }

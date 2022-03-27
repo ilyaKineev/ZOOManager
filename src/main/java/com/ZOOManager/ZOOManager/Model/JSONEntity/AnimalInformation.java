@@ -29,12 +29,12 @@ public class AnimalInformation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AnimalInformation that = (AnimalInformation) o;
-        return name.equals(that.name) && kindOfAnimal.equals(that.kindOfAnimal);
+        return Objects.equals(name, that.name) && Objects.equals(kindOfAnimal, that.kindOfAnimal) && Objects.equals(products, that.products);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, kindOfAnimal);
+        return Objects.hash(name, kindOfAnimal, products);
     }
 
     @Override

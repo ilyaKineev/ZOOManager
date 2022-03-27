@@ -2,21 +2,20 @@ package com.ZOOManager.ZOOManager.Service;
 
 import com.ZOOManager.ZOOManager.Model.Animal;
 import com.ZOOManager.ZOOManager.Repository.AnimalRepository;
+import com.ZOOManager.ZOOManager.Repository.DietRepository;
+import com.ZOOManager.ZOOManager.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
-public class AnimalService {
+public class AnimalService extends AbstractService {
 
-    AnimalRepository animalRepository;
 
-    @Autowired
-    public AnimalService(AnimalRepository animalRepository) {
-        this.animalRepository = animalRepository;
+    public AnimalService(ProductRepository productRepository, DietRepository dietRepository, AnimalRepository animalRepository) {
+        super(productRepository, dietRepository, animalRepository);
     }
 
     public List<Animal> getAll() {
@@ -24,40 +23,41 @@ public class AnimalService {
     }
 
     public Animal getById(long id) {
-        Optional<Animal> animal = animalRepository.findById(id);
-        return animal.get();
+        Optional<Animal> animal = (animalRepository.findById(id));
+        return animal.orElseGet(Animal::new);
     }
 
-    public void create(Animal animal) {
+    public boolean create(Animal animal) {
         animalRepository.save(animal);
+        return animalRepository.existsById(animal.getId());
     }
 
     public boolean update(Animal animal, long id) {
-        Optional<Animal> animalOptional = animalRepository.findById(id);
-        Animal oldAnimal = animalOptional.get();
+        Animal oldAnimal = getById(id);
         oldAnimal.setName(animal.getName());
         oldAnimal.setKindOfAnimal(animal.getKindOfAnimal());
         oldAnimal.setPredator(animal.isPredator());
         animalRepository.save(oldAnimal);
-        return true;
+        return !oldAnimal.equals(animalRepository.findById(id));
     }
 
     public boolean delete(long id) {
         animalRepository.deleteById(id);
-        if (animalRepository.findById(id).isPresent()) return false;
-        return true;
+        if (getById(id) == null) return false;
+        return !animalRepository.existsById(id);
     }
 
     public boolean delete(List<Animal> animals) {
+        boolean isExists = true;
         for (Animal animal : animals) {
-            animalRepository.deleteById(animal.getId());
+            isExists = delete(animal.getId());
         }
-        return true;
+        return isExists;
     }
 
     public boolean delete() {
         animalRepository.deleteAll();
-        return true;
+        return animalRepository.count() <= 0;
     }
 
 

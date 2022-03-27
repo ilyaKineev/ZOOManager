@@ -3,6 +3,7 @@ package com.ZOOManager.ZOOManager.Model;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "product")
@@ -59,6 +60,19 @@ public class Product {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id == product.id && quantity == product.quantity && Objects.equals(name, product.name) && Objects.equals(measure, product.measure) && Objects.equals(type, product.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, quantity, measure, type);
     }
 
     @Override
